@@ -243,6 +243,7 @@ async def ingest_file_endpoint(
 
 class AgentRequest(BaseModel):
     query: str
+    thread_id: str
 
 
 class AgentResponse(BaseModel):
@@ -261,7 +262,7 @@ async def agent_endpoint(request: AgentRequest):
     start_time = time.time()
 
     try:
-        result = await asyncio.to_thread(run_agent, request.query)
+        result = await asyncio.to_thread(run_agent, query=request.query, thread_id=request.thread_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Agent failed: {str(e)}")
 

@@ -3,6 +3,7 @@ from langgraph.graph import StateGraph, START, END
 from typing import TypedDict, Literal
 from model_service import generate_text  # Your Week 1 LLM function
 from agent_tools import rag_search_tool, sql_query_tool, calculator_tool
+from langgraph.checkpoint.memory import MemorySaver
 
 
 # 1. Define the Agent State
@@ -173,14 +174,17 @@ def build_agent():
     # Generator leads to END
     graph.add_edge("generator", END)
 
-    return graph.compile()
+    memory = MemorySaver()
+    
+    # Compile the graph WITH the checkpointer
+    return graph.compile(checkpointer=memory)
 
 
 # Singleton agent instance
 agent = build_agent()
 
 
-def run_agent(query: str) -> dict:
+def run_agent(query: str, thread_id: str = "default_thread") -> dict:
     """Main entry point for the agent."""
     initial_state = {
         "user_query": query,
@@ -190,7 +194,11 @@ def run_agent(query: str) -> dict:
         "final_answer": "",
     }
 
-    final_state = agent.invoke(initial_state)
+    # The config is where we pass the thread_id for multi-tenant isolation
+    config = {"configurable": {"thread_id": thread_id}}
+    
+    # Invoke with the config
+    final_state = agent.invoke(initial_state, config=config)
 
     return {
         "answer": final_state["final_answer"],

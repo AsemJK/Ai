@@ -61,3 +61,19 @@ To make WSL2/Docker services accessible from Windows, you need to:
     New-NetFirewallRule -DisplayName "WSL Port 8000" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
     New-NetFirewallRule -DisplayName "WSL Port 8501" -Direction Inbound -Protocol TCP -LocalPort 8501 -Action Allow
     ```
+
+## Agentic notes
+
+1. Agentic workflow: A workflow where an AI agent makes decisions and takes actions to complete a task.
+2. LangGraph: A library for building stateful, multi-agent workflows.
+3. StateGraph: A graph that represents the state of the agent.
+4. Nodes: Nodes in the graph represent the actions that the agent can take.
+5. Edges: Edges in the graph represent the flow of control between nodes.
+6. Conditional edges: Edges that are taken based on the state of the agent.
+
+Available tools:
+
+- "rag": Use this for questions about documents, policies, procedures, or any information that would be in uploaded files.
+- "sql": Use this for questions about server inventory, GPU counts, rack status, temperatures, power usage, or any structured data center data.
+- "calculator": Use this for pure math questions.
+- "direct": Use this for general greetings or questions that don't need any tool.

@@ -3,6 +3,7 @@ import requests
 import io
 import time
 import random
+import uuid
 
 # --- Configuration ---
 FASTAPI_URL = "http://localhost:8000"
@@ -13,6 +14,10 @@ st.set_page_config(page_title="RAG Assistant", page_icon="🧠", layout="wide")
 # --- Session State Initialization ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
+    
+# NEW: Initialize a unique thread_id for this chat session
+if "thread_id" not in st.session_state:
+    st.session_state.thread_id = str(uuid.uuid4())
 
 # --- Sidebar: Document Ingestion ---
 with st.sidebar:
@@ -97,7 +102,7 @@ if prompt := st.chat_input("Ask anything about your docs, servers, or math..."):
         message_placeholder.markdown("🤔 *Routing to the right tool...*")
 
         try:
-            payload = {"query": prompt}
+            payload = {"query": prompt,"thread_id": st.session_state.thread_id}
             response = requests.post(f"{FASTAPI_URL}/api/v1/agent", json=payload)
 
             if response.status_code == 200:
@@ -177,4 +182,14 @@ if prompt := st.chat_input("Ask anything about your docs, servers, or math..."):
 
 # --- Footer ---
 st.divider()
+ # NEW: Chat History Controls
+st.header("💬 Chat Session")
+st.caption(f"Session ID: `{st.session_state.thread_id[:8]}...`")
+
+if st.button("🔄 Start New Chat", use_container_width=True):
+    # Clear the UI history and generate a new thread_id
+    st.session_state.messages = []
+    st.session_state.thread_id = str(uuid.uuid4())
+    st.rerun()
+
 st.caption("Built for Week 2/3 of the AI Platform Engineering Roadmap.")
