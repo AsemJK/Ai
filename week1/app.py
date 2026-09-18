@@ -28,20 +28,19 @@ with st.sidebar:
         "Choose a file",
         type=["pdf", "docx", "xlsx"],
         help="Supported formats: PDF, Word, Excel",
+        # accept_multiple_files=True,
+        on_change=lambda: st.rerun()
     )
 
-    doc_id = st.text_input(
-        "Document ID",
-        value=str(random.randint(1, 9999999)),
-        help="Unique identifier for this document",
-    )
-    source = st.text_input(
-        "Source/Metadata",
-        value="manual_upload",
-        help="E.g., 'HR_Policy', 'Financial_Report'",
-    )
-
-    if st.button("🚀 Ingest Document"):
+    doc_id = random.randint(1, 9999999)
+    # source = st.text_input(
+    #     "Source/Metadata",
+    #     value="general",
+    #     help="E.g., 'HR_Policy', 'Financial_Report'",
+    # )
+    source_options = st.sidebar.selectbox("Source/Metadata",["general","EA","Software Architecture","Software Engineering","API","programming","csharp","javascript","python","rust","sql","mysql","postgres","sqlite","ai","mobile","web","data","religion","health","finance","HR"])   
+    ingest_button = st.button("🚀 Ingest Document")
+    if ingest_button:
         if uploaded_file is None:
             st.warning("Please select a file to upload.")
         else:
@@ -55,7 +54,8 @@ with st.sidebar:
                             uploaded_file.type,
                         )
                     }
-                    data = {"doc_id": doc_id, "source": source}
+                    st.session_state.source = source_options
+                    data = {"doc_id": doc_id, "source": st.session_state.source}
 
                     # Call the FastAPI ingestion endpoint
                     response = requests.post(
@@ -91,12 +91,19 @@ for message in st.session_state.messages:
 
 # Chat input
 # In app.py, replace the chat input section with:
+enable_rag = st.sidebar.checkbox("Force using RAG",value=True)
 
 if prompt := st.chat_input("Ask anything about your docs, servers, or math..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-
+    
+    if enable_rag:
+        prompt = "rag " + prompt
+        st.sidebar.text(f"forcing rag mode")
+    else:
+        st.sidebar.text(f"tool auto-selecting mode")    
+        
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         message_placeholder.markdown("🤔 *Routing to the right tool...*")
@@ -183,13 +190,16 @@ if prompt := st.chat_input("Ask anything about your docs, servers, or math..."):
 # --- Footer ---
 st.divider()
  # NEW: Chat History Controls
-st.header("💬 Chat Session")
-st.caption(f"Session ID: `{st.session_state.thread_id[:8]}...`")
+# st.header("💬 Chat Session")
+# st.caption(f"Session ID: `{st.session_state.thread_id[:8]}...`")
 
-if st.button("🔄 Start New Chat", use_container_width=True):
-    # Clear the UI history and generate a new thread_id
-    st.session_state.messages = []
-    st.session_state.thread_id = str(uuid.uuid4())
-    st.rerun()
+with st.sidebar:
+    if st.button("🔄 Start New Chat", use_container_width=True):
+        # Clear the UI history and generate a new thread_id
+        st.session_state.messages = []
+        st.session_state.thread_id = str(uuid.uuid4())
+        st.rerun()
+    st.header("💬 Chat Session")
+    st.caption(f"Session ID: `{st.session_state.thread_id[:8]}...`")
 
 st.caption("Built for Week 2/3 of the AI Platform Engineering Roadmap.")

@@ -57,7 +57,14 @@ JSON response:"""
     except (json.JSONDecodeError, ValueError):
         # Fallback: keyword-based routing for small models
         query_lower = state["user_query"].lower()
-        if any(
+    #I need to check if input start with specific set of characters to 
+    #force llm to use rag tool
+    # for example "rag "
+    
+        if query_lower.startswith("rag "):
+            tool_choice = "rag"
+            tool_input = state["user_query"][4:]
+        elif any(
             kw in query_lower
             for kw in ["server", "gpu", "rack", "temperature", "power", "node"]
         ):
@@ -65,7 +72,7 @@ JSON response:"""
             tool_input = state["user_query"]
         elif any(
             kw in query_lower
-            for kw in ["policy", "document", "procedure", "how to", "what does"]
+            for kw in ["policy", "document", "procedure", "how to", "what does", "extract", "search"]
         ):
             tool_choice = "rag"
             tool_input = state["user_query"]
@@ -78,6 +85,8 @@ JSON response:"""
             tool_choice = "direct"
             tool_input = state["user_query"]
 
+    #for example "rag "
+    
     return {**state, "tool_choice": tool_choice, "tool_input": tool_input}
 
 

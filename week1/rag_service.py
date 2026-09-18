@@ -57,7 +57,7 @@ def ingest_document(doc_id: str, text: str, metadata: dict):
     return len(chunks)
 
 
-def retrieve_context(query: str, top_k: int = 3) -> list[dict]:
+def retrieve_context(query: str, top_k: int = 5) -> list[dict]:
     """Searches Qdrant for the most relevant text chunks."""
     # 1. Embed the user's query
     query_vector = EMBEDDING_MODEL.encode(query).tolist()

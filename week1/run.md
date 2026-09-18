@@ -4,6 +4,17 @@
 4- run backend using uvicorn:
 uvicorn main:app --reload --port 8000
 
+## one command to run backend
+
+cd week1 && source venv/bin/activate && uvicorn main:app --reload --port 8000
+
+_If the address already in use error_
+**linux**
+sudo lsof -t -i tcp:8000 | xargs kill -9
+**windows**
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
+
 http://localhost:8000/docs
 
 ### Streamlit Notes
@@ -24,7 +35,10 @@ connectaddress=172.21.200.76`
 now I can access streamlit on [IP_ADDRESS]
 
 run UI using streamlit:
-streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+
+## on command to run streamlit
+
+cd week1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 
 3. Then allow the port through Windows Firewall
 
