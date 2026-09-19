@@ -1,3 +1,20 @@
+# 1 Qdrant Docker
+
+prepare folder for db:
+
+```bash
+cd C:\\Dev\\Learning\\ai\\week1
+mkdir -p qdrant_storage
+```
+
+## run qdrant
+
+```bash
+docker run -d -p 6333:6333 -p 6334:6334 -v C:\\Dev\\Learning\\ai\\week1\\qdrant_storage:/qdrant/storage --name qdrant qdrant/qdrant
+```
+
+# 2 Python 3.12
+
 Yes — that explains the `apt` error. You're on **Ubuntu 26.04 LTS (Resolute)**, whose default Python is **3.14**, so `python3.12` isn't in the standard repository.
 
 More importantly, I would **not downgrade the system Python**. Keep Ubuntu's Python 3.14 and install Python 3.12 alongside it.

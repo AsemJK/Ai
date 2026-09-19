@@ -41,7 +41,7 @@ JSON response:"""
 
     # Call the LLM
     raw_response = generate_text(
-        prompt=routing_prompt, max_new_tokens=100, temperature=0.1
+        prompt=routing_prompt, max_new_tokens=2048, temperature=0.1
     )
 
     # Parse the LLM's JSON response

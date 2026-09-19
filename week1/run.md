@@ -6,7 +6,7 @@ uvicorn main:app --reload --port 8000
 
 ## one command to run backend
 
-cd week1 && source venv/bin/activate && uvicorn main:app --reload --port 8000
+cd /mnt/c/Dev/Learning/ai/week1 && source venv/bin/activate && uvicorn main:app --reload --port 8000
 
 _If the address already in use error_
 **linux**
@@ -38,7 +38,7 @@ run UI using streamlit:
 
 ## on command to run streamlit
 
-cd week1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+cd /mnt/c/Dev/Learning/ai/week1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 
 3. Then allow the port through Windows Firewall
 

@@ -33,7 +33,6 @@ def ingest_document(doc_id: str, text: str, metadata: dict):
     """Chunks (simplified), embeds, and stores text in Qdrant."""
     # Simple chunking: split by paragraphs for this tutorial
     chunks = [chunk.strip() for chunk in text.split("\n\n") if chunk.strip()]
-
     points = []
     for i, chunk in enumerate(chunks):
         # Generate the dense vector embedding
@@ -55,7 +54,6 @@ def ingest_document(doc_id: str, text: str, metadata: dict):
     # Upsert (insert or update) into Qdrant
     client.upsert(collection_name=COLLECTION_NAME, points=points)
     return len(chunks)
-
 
 def retrieve_context(query: str, top_k: int = 5) -> list[dict]:
     """Searches Qdrant for the most relevant text chunks."""

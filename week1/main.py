@@ -200,7 +200,7 @@ Answer:"""
 @app.post("/api/v1/ingest-file")
 async def ingest_file_endpoint(
     file: UploadFile = File(
-        ..., description="The document to ingest (PDF, DOCX, XLSX)"
+        ..., description="The document to ingest (PDF, DOCX, XLSX,TXT)"
     ),
     doc_id: str = Form(..., description="Unique identifier for the document"),
     source: str = Form(default="uploaded_file", description="Source metadata"),

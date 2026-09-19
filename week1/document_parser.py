@@ -2,6 +2,7 @@ import io
 import pandas as pd
 from docx import Document
 from pypdf import PdfReader
+from ebooklib import epub
 
 def parse_pdf(file_bytes: bytes) -> str:
     reader = PdfReader(io.BytesIO(file_bytes))
@@ -28,6 +29,17 @@ def parse_excel(file_bytes: bytes) -> str:
         text += f"Record {index + 1}: {row_data}\n\n"
     return text
 
+def parse_txt(file_bytes: bytes) -> str:
+    return file_bytes.decode("utf-8", errors="ignore")
+
+def parse_epub(file_bytes: bytes) -> str:    
+    book = epub.read_epub(io.BytesIO(file_bytes))
+    text = ""
+    for item in book.get_items():
+        if item.get_type() == epub.FILE_TYPE_DOCUMENT:
+            text += item.get_content().decode("utf-8", errors="ignore") + "\n\n"
+    return text
+
 def parse_document(filename: str, file_bytes: bytes) -> str:
     """Dispatcher function based on file extension."""
     filename = filename.lower()
@@ -37,5 +49,9 @@ def parse_document(filename: str, file_bytes: bytes) -> str:
         return parse_docx(file_bytes)
     elif filename.endswith(".xlsx") or filename.endswith(".xls"):
         return parse_excel(file_bytes)
+    elif filename.endswith(".txt"):
+        return parse_txt(file_bytes)
+    elif filename.endswith(".epub"):
+        return parse_epub(file_bytes)
     else:
         raise ValueError(f"Unsupported file format: {filename}")

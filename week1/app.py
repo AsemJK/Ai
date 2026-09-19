@@ -1,9 +1,9 @@
 import streamlit as st
 import requests
-import io
-import time
 import random
 import uuid
+import bulk_ingest
+import web_scraper
 
 # --- Configuration ---
 FASTAPI_URL = "http://localhost:8000"
@@ -19,15 +19,27 @@ if "messages" not in st.session_state:
 if "thread_id" not in st.session_state:
     st.session_state.thread_id = str(uuid.uuid4())
 
+
 # --- Sidebar: Document Ingestion ---
 with st.sidebar:
     st.header("📂 Knowledge Base Management")
+    
+    #web scraper
+    st.sidebar.header("Web Scraper")
+    web_url = st.sidebar.text_input("Web URL")
+    if st.sidebar.button("Scrape", use_container_width=True):
+        with st.spinner("Scraping..."):
+            web_scraper.scrape_and_ingest(web_url)
+        st.markdown("Upload documents to ground the AI's answers.")
+
+    st.sidebar.divider()
+    #single file ingest
     st.markdown("Upload documents to ground the AI's answers.")
 
     uploaded_file = st.file_uploader(
         "Choose a file",
-        type=["pdf", "docx", "xlsx"],
-        help="Supported formats: PDF, Word, Excel",
+        type=["pdf", "docx", "xlsx","txt","epub"],
+        help="Supported formats: PDF, Word, Excel, TXT, EPUB",
         # accept_multiple_files=True,
         on_change=lambda: st.rerun()
     )
@@ -79,6 +91,14 @@ with st.sidebar:
                     st.error(
                         "❌ Cannot connect to backend. Is FastAPI running on port 8000?"
                     )
+# ingest bulk
+st.sidebar.divider()
+st.sidebar.header("Bulk Ingestion")
+folder_path = st.sidebar.text_input("Folder Path")
+if folder_path:
+    if st.sidebar.button("Start Bulk Ingestion", use_container_width=True):
+        with st.spinner("Processing folder..."):
+            bulk_ingest.ingest_folder(folder_path)
 
 # --- Main Area: Chat Interface ---
 st.title("🧠 Enterprise RAG Assistant")
@@ -91,7 +111,7 @@ for message in st.session_state.messages:
 
 # Chat input
 # In app.py, replace the chat input section with:
-enable_rag = st.sidebar.checkbox("Force using RAG",value=True)
+enable_rag = st.checkbox("Force using RAG",value=True)
 
 if prompt := st.chat_input("Ask anything about your docs, servers, or math..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -147,46 +167,6 @@ if prompt := st.chat_input("Ask anything about your docs, servers, or math..."):
         except requests.exceptions.ConnectionError:
             message_placeholder.error("❌ Backend not reachable.")
 
-# if prompt := st.chat_input("Ask a question about your uploaded documents..."):
-#     # 1. Add user message to state and display
-#     st.session_state.messages.append({"role": "user", "content": prompt})
-#     with st.chat_message("user"):
-#         st.markdown(prompt)
-
-#     # 2. Generate assistant response
-#     with st.chat_message("assistant"):
-#         message_placeholder = st.empty()
-#         message_placeholder.markdown("🤔 *Thinking and retrieving context...*")
-
-#         try:
-#             # Call the FastAPI RAG endpoint
-#             payload = {"query": prompt, "max_new_tokens": 256}
-#             response = requests.post(f"{FASTAPI_URL}/api/v1/rag-query", json=payload)
-
-#             if response.status_code == 200:
-#                 result = response.json()
-#                 answer = result["generated_text"]
-#                 processing_time = result["processing_time_ms"]
-
-#                 # Display the answer and a small metadata footer
-#                 message_placeholder.markdown(answer)
-#                 st.caption(
-#                     f"⏱️ Processed in {processing_time:.2f} ms | 🤖 Model: {result['model_used']}"
-#                 )
-
-#                 # 3. Add assistant message to state
-#                 st.session_state.messages.append(
-#                     {"role": "assistant", "content": answer}
-#                 )
-#             else:
-#                 error_msg = response.json().get("detail", "Unknown error")
-#                 message_placeholder.error(f"❌ API Error: {error_msg}")
-
-#         except requests.exceptions.ConnectionError:
-#             message_placeholder.error(
-#                 "❌ Cannot connect to backend. Is FastAPI running?"
-#             )
-
 # --- Footer ---
 st.divider()
  # NEW: Chat History Controls
@@ -203,3 +183,4 @@ with st.sidebar:
     st.caption(f"Session ID: `{st.session_state.thread_id[:8]}...`")
 
 st.caption("Built for Week 2/3 of the AI Platform Engineering Roadmap.")
+
