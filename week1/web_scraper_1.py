@@ -20,7 +20,7 @@ def extract_text_from_url(url: str) -> str:
     
     return soup.get_text(separator="\n", strip=True)
 
-def scrape_and_ingest(url: str, source: str = "web_scrape") -> dict:
+def scrape_and_ingest(url: str, source: str = "web_scrape",scan_links: bool = False) -> dict:
     # Get title of page 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -35,30 +35,48 @@ def scrape_and_ingest(url: str, source: str = "web_scrape") -> dict:
     # scan the url and go through all the links and scrape them
     links = soup.find_all("a")
     total_chunks = 0
-    for link in links:
-        link_url = link.get("href")
-        if link_url and link_url.startswith("http"):
-            #avoid common web pages links like contact us, about us, terms and conditions, privacy policy
-            if "contact" in link_url or "about" in link_url or "terms" in link_url or "privacy" in link_url or "login" in link_url or "signin" in link_url or "signup" in link_url or "cart" in link_url or "account" in link_url or "checkout" in link_url or "faq" in link_url or "help" in link_url or "support" in link_url or "mailto:" in link_url or "tel:" in link_url or "javascript:" in link_url:
-                continue
-            link_text = extract_text_from_url(link_url)
-            if len(link_text) < 200:
-                continue
-            text_io = io.BytesIO(link_text.encode("utf-8"))
-            doc_id = str(random.randint(1, 9_999_999))
-            files = {
-                "file": (f"{doc_id}.txt", text_io, "text/plain")
-            }
-            data = {"doc_id": doc_id, "source": source}
+    if scan_links:
+        for link in links:
+            link_url = link.get("href")
+            if link_url and link_url.startswith("http"):
+                #avoid common web pages links like contact us, about us, terms and conditions, privacy policy
+                if "contact" in link_url or "about" in link_url or "terms" in link_url or "privacy" in link_url or "login" in link_url or "signin" in link_url or "signup" in link_url or "cart" in link_url or "account" in link_url or "checkout" in link_url or "faq" in link_url or "help" in link_url or "support" in link_url or "mailto:" in link_url or "tel:" in link_url or "javascript:" in link_url:
+                    continue
+                link_text = extract_text_from_url(link_url)
+                if len(link_text) < 200:
+                    continue
+                text_io = io.BytesIO(link_text.encode("utf-8"))
+                doc_id = str(random.randint(1, 9_999_999))
+                files = {
+                    "file": (f"{doc_id}.txt", text_io, "text/plain")
+                }
+                data = {"doc_id": doc_id, "source": source}
 
-            response = requests.post(
-                f"{FASTAPI_URL}/api/v1/ingest-file", files=files, data=data
-            )
+                response = requests.post(
+                    f"{FASTAPI_URL}/api/v1/ingest-file", files=files, data=data
+                )
 
-            if response.status_code != 200:
-                print("Failed to ingest link: ", link_url)
-            else:
-                total_chunks += response.json()["chunks_added"]
+                if response.status_code != 200:
+                    print("Failed to ingest link: ", link_url)
+                else:
+                    total_chunks += response.json()["chunks_added"]
+    else:
+        text = extract_text_from_url(url)
+        text_io = io.BytesIO(text.encode("utf-8"))
+        doc_id = str(random.randint(1, 9_999_999))
+        files = {
+            "file": (f"{doc_id}.txt", text_io, "text/plain")
+        }
+        data = {"doc_id": doc_id, "source": source}
+
+        response = requests.post(
+            f"{FASTAPI_URL}/api/v1/ingest-file", files=files, data=data
+        )
+
+        if response.status_code != 200:
+            print("Failed to ingest link: ", url)
+        else:
+            total_chunks += response.json()["chunks_added"]
     return {"status": "success", "chunks_added": total_chunks}
 
 

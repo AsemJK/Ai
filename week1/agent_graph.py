@@ -37,11 +37,23 @@ Examples:
 - "Hello!" → {{"tool": "direct", "input": "Hello!"}}
 
 User question: {state["user_query"]}
+
+Provide a detailed and comprehensive answer.
+
+Requirements:
+- Explain the concept clearly.
+- Provide step-by-step reasoning.
+- Include practical examples.
+- Explain important edge cases.
+- Include code examples where appropriate.
+- Do not give a short summary only.
+- Structure the response using headings and bullet points.
+
 JSON response:"""
 
     # Call the LLM
     raw_response = generate_text(
-        prompt=routing_prompt, max_new_tokens=2048, temperature=0.1
+        prompt=routing_prompt, max_new_tokens=4096, temperature=0.2
     )
 
     # Parse the LLM's JSON response

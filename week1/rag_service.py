@@ -55,7 +55,7 @@ def ingest_document(doc_id: str, text: str, metadata: dict):
     client.upsert(collection_name=COLLECTION_NAME, points=points)
     return len(chunks)
 
-def retrieve_context(query: str, top_k: int = 5) -> list[dict]:
+def retrieve_context(query: str, top_k: int = 50) -> list[dict]:
     """Searches Qdrant for the most relevant text chunks."""
     # 1. Embed the user's query
     query_vector = EMBEDDING_MODEL.encode(query).tolist()
@@ -66,7 +66,7 @@ def retrieve_context(query: str, top_k: int = 5) -> list[dict]:
         query=query_vector,
         limit=top_k,
         with_payload=True,
-        score_threshold=0.6,  # 0.x means only x*100% similarity is required to return a chunk.
+        score_threshold=0.5,  # 0.x means only x*100% similarity is required to return a chunk.
     )
 
     # 3. Format results

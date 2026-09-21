@@ -3,7 +3,7 @@ import requests
 import random
 import uuid
 import bulk_ingest
-import web_scraper
+import web_scraper_3 as web_scraper
 
 # --- Configuration ---
 FASTAPI_URL = "http://localhost:8000"
@@ -29,13 +29,9 @@ with st.sidebar:
     web_url = st.sidebar.text_input("Web URL")
     if st.sidebar.button("Scrape", use_container_width=True):
         with st.spinner("Scraping..."):
-            web_scraper.scrape_and_ingest(web_url)
-        st.markdown("Upload documents to ground the AI's answers.")
-
+            web_scraper.scrape_and_ingest(web_url, scan_links=True) #scan links = True for scanning all the links of the given page and also sub-pages
     st.sidebar.divider()
     #single file ingest
-    st.markdown("Upload documents to ground the AI's answers.")
-
     uploaded_file = st.file_uploader(
         "Choose a file",
         type=["pdf", "docx", "xlsx","txt","epub"],

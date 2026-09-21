@@ -10,7 +10,7 @@ mkdir -p qdrant_storage
 ## run qdrant
 
 ```bash
-docker run -d -p 6333:6333 -p 6334:6334 -v C:\\Dev\\Learning\\ai\\week1\\qdrant_storage:/qdrant/storage --name qdrant qdrant/qdrant
+docker run -d -p 6333:6333 -p 6334:6334 -v D:\\qdrant_storage:/qdrant/storage --name qdrant qdrant/qdrant
 ```
 
 # 2 Python 3.12
