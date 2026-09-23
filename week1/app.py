@@ -22,10 +22,9 @@ if "thread_id" not in st.session_state:
 
 # --- Sidebar: Document Ingestion ---
 with st.sidebar:
-    st.header("📂 Knowledge Base Management")
+    st.markdown("📂 Knowledge Base Management")
     
     #web scraper
-    st.sidebar.header("Web Scraper")
     web_url = st.sidebar.text_input("Web URL")
     if st.sidebar.button("Scrape", use_container_width=True):
         with st.spinner("Scraping..."):

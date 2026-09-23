@@ -9,8 +9,12 @@ mkdir -p qdrant_storage
 
 ## run qdrant
 
-```bash
-docker run -d -p 6333:6333 -p 6334:6334 -v D:\\qdrant_storage:/qdrant/storage --name qdrant qdrant/qdrant
+```bash windows
+docker run -d --name qdrant -p 6333:6333 -p 6334:6334 -v D:\\qdrant_storage:/qdrant/storage qdrant/qdrant
+```
+
+```bash wsl
+docker run -d --name qdrant -p 6333:6333 -p 6334:6334 -v /mnt/d/qdrant_storage:/qdrant/storage qdrant/qdrant
 ```
 
 # 2 Python 3.12
@@ -150,3 +154,15 @@ For example, if GCC says:
 then Python 3.12 won't fix the underlying problem—we need to fix WSL's CUDA library path.
 
 If you have the complete traceback as a text file, you can upload it here and I can inspect the exact GCC failure:
+
+## Image to text OCR
+
+pip install easyocr pdf2image pytesseract pillow
+
+### Also need poppler (for pdf2image):
+
+### Ubuntu: sudo apt-get install poppler-utils
+
+### Mac: brew install poppler
+
+### Windows: download from https://github.com/oschwartz10612/poppler-windows/releases/

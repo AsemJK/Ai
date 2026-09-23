@@ -213,7 +213,7 @@ async def ingest_file_endpoint(
         file_bytes = await file.read()
 
         # 2. Parse the document into raw text
-        extracted_text = parse_document(file.filename, file_bytes)
+        extracted_text = parse_document(file.filename, file_bytes,ocr_engine= "easyocr")
 
         if not extracted_text.strip():
             raise HTTPException(

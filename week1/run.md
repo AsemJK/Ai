@@ -1,3 +1,9 @@
+## docker qdrant
+
+docker run -d --name qdrant -p 6333:6333 -p 6334:6334 -v D:\\qdrant_storage:/qdrant/storage qdrant/qdrant
+
+## run backend
+
 1- open wsl terminal session
 2- cd week1
 3- activate venv : source venv/bin/activate
@@ -7,6 +13,7 @@ uvicorn main:app --reload --port 8000
 ## one command to run backend
 
 cd /mnt/c/Dev/Learning/ai/week1 && source venv/bin/activate && uvicorn main:app --reload --port 8000
+cd /mnt/c/Dev/Learning/ai/week1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8000
 
 _If the address already in use error_
 **linux**

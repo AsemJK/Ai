@@ -261,7 +261,7 @@ def scrape_and_ingest(
         return {"status": "error", "message": "Invalid URL – must start with http(s)"}
 
     title = get_page_title(url)
-    source_label = f"web_scrape - {title}"
+    source_label = f"{title} - {url}"
     total_chunks = 0
     pages_ingested = 0
 
@@ -565,8 +565,8 @@ if __name__ == "__main__":
     # --- Example: ingest emails ---
     reader = EmailReader(
         imap_server="outlook.office365.com",
-        email_address="asem@elite-tech.co",
-        password="Elite@2025",   # use an App Password, not your real password
+        email_address="[EMAIL_ADDRESS]",
+        password="[PASSWORD]",   # use an App Password, not your real password
     )
     email_result = reader.ingest_folder(
         folder="INBOX",
