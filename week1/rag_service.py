@@ -12,8 +12,9 @@ import hashlib
 
 # with 8gb vram what is the best hugging face model to use for RAG?
 # bge-large-en-v1.5 is a good choice
-EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-large-en-v1.5")
 # EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-small-en-v1.5")
+# EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-large-en-v1.5")
+EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-m3")
 
 
 # 2. Initialize Qdrant Client (Local Docker instance)

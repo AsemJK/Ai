@@ -1,6 +1,19 @@
 ## docker qdrant
 
-docker run -d --name qdrant -p 6333:6333 -p 6334:6334 -v D:\\qdrant_storage:/qdrant/storage qdrant/qdrant
+docker run -d --name qdrant --restart unless-stopped -p 6333:6333 -p 6334:6334 -v D:\\qdrant_storage:/qdrant/storage qdrant/qdrant
+docker run -d --name qdrant --restart unless-stopped -p 6333:6333 -p 6334:6334 -v C:\\qdrant_storage:/qdrant/storage qdrant/qdrant
+
+### check if it is running
+
+docker ps
+
+### start qdrant
+
+docker start qdrant
+
+### stop qdrant
+
+docker stop qdrant
 
 ## run backend
 
@@ -12,8 +25,15 @@ uvicorn main:app --reload --port 8000
 
 ## one command to run backend
 
-cd /mnt/c/Dev/Learning/ai/week1 && source venv/bin/activate && uvicorn main:app --reload --port 8000
-cd /mnt/c/Dev/Learning/ai/week1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8000
+```bash
+cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate && uvicorn main:app --reload --port 8000
+```
+
+or without --reload flag
+
+```bash
+cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8000
+```
 
 _If the address already in use error_
 **linux**
@@ -45,7 +65,9 @@ run UI using streamlit:
 
 ## on command to run streamlit
 
-cd /mnt/c/Dev/Learning/ai/week1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+```bash
+cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+```
 
 3. Then allow the port through Windows Firewall
 

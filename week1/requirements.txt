@@ -10,3 +10,17 @@ pypdf
 python-docx
 pandas
 openpyxl
+ebooklib
+streamlit
+langgraph
+networkx
+bs4
+beautifulsoup4
+lxml
+trafilatura
+playwright
+python-dotenv
+pandas
+html2text
+logging
+typing-extensions

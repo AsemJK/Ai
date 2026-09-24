@@ -81,7 +81,7 @@ pyenv install 3.12.11
 Set it for your project:
 
 ```bash
-cd /mnt/c/Dev/Learning/ai/week1
+cd /mnt/c/dev/learning/ai/week1
 
 pyenv local 3.12.11
 
@@ -115,7 +115,16 @@ Then:
 python -m pip install --upgrade pip setuptools wheel
 ```
 
----
+```bash
+
+sudo apt install uvicorn
+```
+
+### install requirements
+
+```bash
+pip install -r requirements.txt
+```
 
 ### But let's fix the original Triton problem properly
 
@@ -133,6 +142,10 @@ ls -l /usr/lib/wsl/lib/libcuda.so.1
 
 ```bash
 nvidia-smi
+```
+
+```bash
+cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate
 ```
 
 ```bash

@@ -5,9 +5,9 @@ from transformers import pipeline, AutoTokenizer
 # with VRAM 8 GB what is the best hugging face model to use for RAG?
 # Mixtral 8x7B is a good choice for RAG with 8GB VRAM
 # MODEL_ID = "deepseek-ai/DeepSeek-V4.1-Flash"
-# MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
-# MODEL_ID = "ukisai/Swift-Qwen3.8-27b"
-MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
+MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
+#MODEL_ID = "ukisai/Swift-Qwen3.8-27b"
+# MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
 
 
 # 2. Determine device (GPU if available, else CPU)

@@ -51,7 +51,9 @@ def parse_pdf(file_bytes: bytes, ocr_engine: str = "easyocr", lang: str = "ara+e
     for page in reader.pages:
         extracted = page.extract_text()
         if extracted:
-            full_text += extracted + "\n\n"
+            # Strip invalid surrogates from each page
+            cleaned = extracted.encode("utf-8", "ignore").decode("utf-8")
+            full_text += cleaned + "\n\n"
             
     # 2. Smart Fallback: If text is empty or just a few words (e.g., headers/footers), use OCR
     if len(full_text.strip()) < 50:
@@ -64,7 +66,7 @@ def parse_pdf(file_bytes: bytes, ocr_engine: str = "easyocr", lang: str = "ara+e
         else:
             full_text = ocr_pdf_bytes_tesseract(file_bytes, lang=lang)
             
-    return full_text
+    return full_text.encode("utf-8", "ignore").decode("utf-8")
 
 
 def ocr_pdf_bytes_tesseract(file_bytes: bytes, lang: str = "ara+eng") -> str:
