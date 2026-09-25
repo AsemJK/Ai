@@ -26,9 +26,10 @@ with st.sidebar:
     
     #web scraper
     web_url = st.sidebar.text_input("Web URL")
+    link_depth = st.sidebar.number_input("Link Depth", min_value=0, max_value=10, value=1, help="Number of links to follow from the main page")
     if st.sidebar.button("Scrape", use_container_width=True):
         with st.spinner("Scraping..."):
-            web_scraper.scrape_and_ingest(web_url, scan_links=True) #scan links = True for scanning all the links of the given page and also sub-pages
+            web_scraper.scrape_and_ingest(web_url, scan_links=True,max_depth=link_depth) #scan links = True for scanning all the links of the given page and also sub-pages
     st.sidebar.divider()
     #single file ingest
     uploaded_file = st.file_uploader(
@@ -96,7 +97,7 @@ if folder_path:
             bulk_ingest.ingest_folder(folder_path)
 
 # --- Main Area: Chat Interface ---
-st.title("🧠 Enterprise RAG Assistant")
+st.markdown("<h4> 🧠 Enterprise RAG Assistant </h4>", unsafe_allow_html=True)
 st.caption("Powered by FastAPI, Qdrant, and Open Source LLMs")
 
 # Display chat history

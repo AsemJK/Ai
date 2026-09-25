@@ -24,3 +24,5 @@ pandas
 html2text
 logging
 typing-extensions
+fontTools
+pythonpy

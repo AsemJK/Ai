@@ -1,6 +1,8 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 import io
+import dotenv
 import trafilatura
 import random
 import time
@@ -270,7 +272,7 @@ def scrape_and_ingest(
     if len(text) >= MIN_CONTENT_LENGTH:
         doc_id = str(random.randint(1, 9_999_999))
         chunks = _ingest_text(text, doc_id, source_label)
-        if chunks is not None:
+        if chunks is not None and chunks > 0:
             total_chunks += chunks
             pages_ingested += 1
             logger.info(f"Ingested main page: {url} | doc_id: {doc_id} | source: {source_label} | ({chunks} chunks)")
@@ -291,7 +293,7 @@ def scrape_and_ingest(
 
             doc_id = str(random.randint(1, 9_999_999))
             chunks = _ingest_text(link_text, doc_id, source_label)
-            if chunks is not None:
+            if chunks is not None and chunks > 0:
                 total_chunks += chunks
                 pages_ingested += 1
                 logger.info(f"Ingested: {link_url} | doc_id: {doc_id} | source: {source_label} | ({chunks} chunks)")
@@ -329,6 +331,7 @@ class EmailReader:
 
     def __init__(self, imap_server: str, email_address: str, password: str):
         self.imap_server = imap_server
+        self.imap_port = 993
         self.email_address = email_address
         self.password = password
         self._h2t = html2text.HTML2Text()
@@ -564,9 +567,9 @@ if __name__ == "__main__":
 
     # --- Example: ingest emails ---
     reader = EmailReader(
-        imap_server="outlook.office365.com",
-        email_address="[EMAIL_ADDRESS]",
-        password="[PASSWORD]",   # use an App Password, not your real password
+        imap_server=os.getenv("IMAP_SERVER"),
+        email_address=os.getenv("MAIL_USERNAME"),
+        password=os.getenv("MAIL_PASSWORD"),   # use an App Password, not your real password
     )
     email_result = reader.ingest_folder(
         folder="INBOX",

@@ -1,6 +1,9 @@
 import torch
+import os
 from transformers import pipeline, AutoTokenizer
+from huggingface_hub import login
 
+login(os.getenv("HF_TOKEN"))
 # 1. Define the model (Swap to "HuggingFaceH4/zephyr-7b-beta" if you have a GPU)
 # with VRAM 8 GB what is the best hugging face model to use for RAG?
 # Mixtral 8x7B is a good choice for RAG with 8GB VRAM
@@ -8,6 +11,9 @@ from transformers import pipeline, AutoTokenizer
 MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
 #MODEL_ID = "ukisai/Swift-Qwen3.8-27b"
 # MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
+# MODEL_ID = "ukisai/Swift-1.5-5bit-MLX"
+# MODEL_ID = "DavidAU/Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic-NEO-IMATRIX-MAX-MTP"
+# MODEL_ID = "mistralai/Ministral-3-8B-Instruct-2512"
 
 
 # 2. Determine device (GPU if available, else CPU)

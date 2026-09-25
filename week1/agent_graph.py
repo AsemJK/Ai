@@ -21,20 +21,21 @@ def router_node(state: AgentState) -> AgentState:
 
     routing_prompt = f"""You are a routing agent. Analyze the user's question and decide which tool to use.
 
-Available tools:
-- "rag": Use this for questions about documents, policies, procedures, or any information that would be in uploaded files.
-- "sql": Use this for questions about server inventory, GPU counts, rack status, temperatures, power usage, or any structured data center data.
-- "calculator": Use this for pure math questions.
-- "direct": Use this for general greetings or questions that don't need any tool.
 
+Available tools:
+- "rag": Use this for questions about documents, policies, procedures, religion, articles, or any information from uploaded files.
+- "sql": Use this for questions about server inventory, GPU counts, rack status, temperatures, power usage, or data center metrics.
+- "calculator": Use this for pure math questions.
+- "direct": Use this for greetings, general conversation, or questions that don't need any external tool.
 Respond with ONLY a JSON object in this exact format:
 {{"tool": "tool_name", "input": "the specific query to send to the tool"}}
-
 Examples:
 - "What does the security policy say about passwords?" → {{"tool": "rag", "input": "security policy passwords"}}
-- "How many GPUs are in RACK-A1?" → {{"tool": "sql", "input": "SELECT hostname, gpu_model, gpu_count FROM servers WHERE rack_id = 'RACK-A1'"}}
-- "What is 15% of 2800?" → {{"tool": "calculator", "input": "2800 * 0.15"}}
-- "Hello!" → {{"tool": "direct", "input": "Hello!"}}
+- "ما هي سياسة كلمة المرور؟" → {{"tool": "rag", "input": "سياسة كلمة المرور"}}
+- "تلخيص الوثيقة المرفقة" → {{"tool": "rag", "input": "تلخيص الوثيقة المرفقة"}}
+- "كم عدد كروت الشاشة في الخادم؟" → {{"tool": "sql", "input": "SELECT hostname, gpu_model, gpu_count FROM servers"}}
+- "احسب 15% من 2800" → {{"tool": "calculator", "input": "2800 * 0.15"}}
+- "مرحبا" → {{"tool": "direct", "input": "مرحبا"}}
 
 User question: {state["user_query"]}
 
@@ -78,18 +79,24 @@ JSON response:"""
             tool_input = state["user_query"][4:]
         elif any(
             kw in query_lower
-            for kw in ["server", "gpu", "rack", "temperature", "power", "node"]
+            for kw in ["server", "gpu", "rack", "temperature", "power", "node",
+            "خادم", "كرت شاشة", "رف", "درجة حرارة", "طاقة", "عقدة"
+            ]
         ):
             tool_choice = "sql"
             tool_input = state["user_query"]
         elif any(
             kw in query_lower
-            for kw in ["policy", "document", "procedure", "how to", "what does", "extract", "search"]
+            for kw in ["policy", "document", "procedure", "how to", "what does", "extract", "search",
+            "سياسة", "وثيقة", "إجراء", "كيف", "ما هو", "استخرج", "بحث"
+            ]
         ):
             tool_choice = "rag"
             tool_input = state["user_query"]
         elif any(
-            kw in query_lower for kw in ["calculate", "what is", "+", "-", "*", "/"]
+            kw in query_lower for kw in ["calculate", "what is", "+", "-", "*", "/",
+            "احسب", "ما هو", "+", "-", "*", "/"
+            ]
         ):
             tool_choice = "calculator"
             tool_input = state["user_query"]
@@ -146,8 +153,10 @@ Tool used: {state["tool_choice"]}
 Tool result:
 {state["tool_result"]}
 
-If the tool result contains data, present it in a clear, readable format.
-If the tool result says 'No relevant documents found' or 'No results found', politely tell the user you don't have that information.
+CRITICAL INSTRUCTIONS:
+1. If the user's question is in Arabic, you MUST reply entirely in fluent Arabic.
+2. If the tool result contains data, present it in a clear format.
+3. If the tool result says 'No relevant documents found', politely inform the user in their language that the information was not found.
 
 Answer:"""
 

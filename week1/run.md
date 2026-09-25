@@ -61,6 +61,31 @@ connectaddress=172.21.200.76`
 
 now I can access streamlit on [IP_ADDRESS]
 
+## example when use tailscale
+
+```bash
+wsl -d ubuntu
+```
+
+```bash
+hostname -I
+```
+
+**output**
+
+```bash
+172.21.200.76
+```
+
+**connect using wsl ip on windows browser**
+[IP_ADDRESS]
+
+3. In Windows Host Machine PowerShell (run as Administrator):
+
+```powershell
+netsh interface portproxy add v4tov4 listenport=8501 listenaddress=0.0.0.0 connectport=8501 connectaddress=172.21.200.76
+```
+
 run UI using streamlit:
 
 ## on command to run streamlit
