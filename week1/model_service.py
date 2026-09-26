@@ -8,9 +8,9 @@ login(os.getenv("HF_TOKEN"))
 # with VRAM 8 GB what is the best hugging face model to use for RAG?
 # Mixtral 8x7B is a good choice for RAG with 8GB VRAM
 # MODEL_ID = "deepseek-ai/DeepSeek-V4.1-Flash"
-MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
-#MODEL_ID = "ukisai/Swift-Qwen3.8-27b"
-# MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
+# MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
+# MODEL_ID = "ukisai/Swift-Qwen3.8-27b"
+MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
 # MODEL_ID = "ukisai/Swift-1.5-5bit-MLX"
 # MODEL_ID = "DavidAU/Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic-NEO-IMATRIX-MAX-MTP"
 # MODEL_ID = "mistralai/Ministral-3-8B-Instruct-2512"
