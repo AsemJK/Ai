@@ -2,7 +2,7 @@ import time
 import asyncio
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from document_parser import parse_document
-from rag_service import setup_collection, ingest_document, retrieve_context
+from rag_service import setup_collection, ingest_document, retrieve_context, generate_rag_prompt
 from schemas import GenerationRequest, GenerationResponse
 from model_service import generate_text, MODEL_ID
 from pydantic import BaseModel
@@ -97,11 +97,11 @@ async def rag_query_endpoint(request: RAGRequest):
     """Retrieves context and generates an answer based STRICTLY on that context."""
     import time
     import asyncio
-
+    
     start_time = time.time()
 
     # 1. Retrieve relevant context
-    context_results = retrieve_context(request.query, top_k=3)
+    context_results = retrieve_context(request.query, top_k=10)
 
     if not context_results:
         raise HTTPException(status_code=404, detail="No relevant documents found.")
@@ -112,12 +112,13 @@ async def rag_query_endpoint(request: RAGRequest):
     )
 
     # 3. THE FIX: Strict Prompt with XML tags and negative constraints
-    grounded_prompt = f"""You are a strict enterprise assistant. You must answer the user's question using ONLY the information provided inside the <context> tags.
-
-CRITICAL RULES:
-1. Do NOT use your pre-trained knowledge.
-2. If the answer is not explicitly stated in the <context>, you must reply with exactly: "I do not have enough information in the provided documents to answer that."
-3. Do not make up facts.
+    grounded_prompt = f"""
+    You are a strict enterprise assistant. You must answer the user's question using ONLY the information provided inside the <context> tags.
+    CRITICAL RULES:
+    1. Do NOT use your pre-trained knowledge.
+    2. give at least 3 position in sources where the information was found.
+    3. give at least 4 sentences from the context that support the answer.
+    4. you should provide the answer in english except if the user asks for the answer in a specific language.
 
 <context>
 {context_text}
@@ -125,12 +126,17 @@ CRITICAL RULES:
 
 Question: {request.query}
 Answer:"""
+    prompts = generate_rag_prompt(request.query, context_results)
+    system_prompt = prompts["system"]
+    user_prompt = prompts["user"]
 
     # 4. Generate response
     try:
         generated_text = await asyncio.to_thread(
             generate_text,
-            prompt=grounded_prompt,
+            prompt=system_prompt +"\n"+ user_prompt, 
+            # 1.  system_prompt +"\n"+ user_prompt, 
+            # 2.  grounded_prompt,
             max_new_tokens=request.max_new_tokens,
             temperature=0.1,  # <-- FIX: Lowered temperature for strict factual adherence
         )

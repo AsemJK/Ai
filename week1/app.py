@@ -169,6 +169,36 @@ st.divider()
 # st.header("💬 Chat Session")
 # st.caption(f"Session ID: `{st.session_state.thread_id[:8]}...`")
 
+# --- Manual Ingestion Section ---
+with st.sidebar.expander("📝 Inject Raw Text", expanded=False):
+    manual_doc_id = st.text_input("Document ID", key="manual_doc_id", value=f"manual_{uuid.uuid4().hex[:8]}")
+    manual_source = st.text_input("Source Name", key="manual_source", value="manual_injection")
+    manual_content = st.text_area("Document Content", key="manual_content", height=200, placeholder="Paste your text here...")
+    
+    if st.button("Ingest Text"):
+        if not manual_content:
+            st.warning("Please enter content to ingest.")
+        else:
+            with st.spinner("Ingesting..."):
+                try:
+                    payload = {
+                        "doc_id": manual_doc_id,
+                        "text": manual_content,
+                        "source": manual_source,
+                    }
+                    response = requests.post(f"{FASTAPI_URL}/api/v1/ingest", json=payload)
+                    
+                    if response.status_code == 200:
+                        result = response.json()
+                        st.success(f"✅ Added {result['chunks_added']} chunks.")
+                        # Clear inputs
+                        st.session_state.manual_content = ""
+                        st.session_state.manual_doc_id = f"manual_{uuid.uuid4().hex[:8]}"
+                    else:
+                        st.error(f"❌ {response.json().get('detail', 'Error')}")
+                except Exception as e:
+                    st.error(f"❌ {str(e)}")
+
 with st.sidebar:
     if st.button("🔄 Start New Chat", use_container_width=True):
         # Clear the UI history and generate a new thread_id

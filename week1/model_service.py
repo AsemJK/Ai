@@ -1,6 +1,6 @@
 import torch
 import os
-from transformers import pipeline, AutoTokenizer
+from transformers import pipeline, AutoTokenizer,GenerationConfig
 from huggingface_hub import login
 
 login(os.getenv("HF_TOKEN"))
@@ -8,9 +8,9 @@ login(os.getenv("HF_TOKEN"))
 # with VRAM 8 GB what is the best hugging face model to use for RAG?
 # Mixtral 8x7B is a good choice for RAG with 8GB VRAM
 # MODEL_ID = "deepseek-ai/DeepSeek-V4.1-Flash"
-# MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
+MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
 # MODEL_ID = "ukisai/Swift-Qwen3.8-27b"
-MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
+# MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
 # MODEL_ID = "ukisai/Swift-1.5-5bit-MLX"
 # MODEL_ID = "DavidAU/Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic-NEO-IMATRIX-MAX-MTP"
 # MODEL_ID = "mistralai/Ministral-3-8B-Instruct-2512"
@@ -20,12 +20,19 @@ MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Loading model on: {device}")
 
-# 3. Initialize the Hugging Face pipeline
+# 3. Initialize Tokenizer & Pipeline with clean_up_tokenization_spaces=False
+tokenizer = AutoTokenizer.from_pretrained(
+    MODEL_ID, 
+    clean_up_tokenization_spaces=False
+)
+
+# 4. Initialize the Hugging Face pipeline
 # We use a 'text-generation' pipeline.
 # trust_remote_code=True is sometimes needed for newer architectures like Qwen.
 generator = pipeline(
     "text-generation",
     model=MODEL_ID,
+    tokenizer=tokenizer,
     device=device,
     torch_dtype=torch.float16 if device == "cuda" else torch.float32,
     trust_remote_code=True,
@@ -34,20 +41,23 @@ generator = pipeline(
 
 def generate_text(prompt: str, max_new_tokens: int, temperature: float) -> dict:
     """
-    Core inference function.
-    Note: HF pipeline is synchronous. We will handle async wrapping in FastAPI.
+    Core inference function using GenerationConfig to avoid deprecation warnings.
     """
-    # Format prompt for chat models (optional but recommended for chat models)
     messages = [{"role": "user", "content": prompt}]
-
-    outputs = generator(
-        messages,
+    # 2. Package generation parameters into a clean GenerationConfig object
+    gen_config = GenerationConfig(
         max_new_tokens=max_new_tokens,
         temperature=temperature,
-        do_sample=True,
+        do_sample=True if temperature > 0 else False,
         pad_token_id=generator.tokenizer.eos_token_id,
+        eos_token_id=generator.tokenizer.eos_token_id,
     )
-
+    # 3. Pass the generation_config object cleanly to the pipeline
+    outputs = generator(
+        messages,
+        generation_config=gen_config,
+        clean_up_tokenization_spaces=False,
+    )
     # Extract the generated text from the nested output structure
     generated_text = outputs[0]["generated_text"][-1]["content"]
     return generated_text
