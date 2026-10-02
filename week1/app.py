@@ -4,6 +4,9 @@ import random
 import uuid
 import bulk_ingest
 import web_scraper_3 as web_scraper
+import re
+from bs4 import BeautifulSoup
+
 
 # --- Configuration ---
 FASTAPI_URL = "http://localhost:8000"
@@ -113,19 +116,18 @@ if prompt := st.chat_input("Ask anything about your docs, servers, or math..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-    
-    if enable_rag:
-        prompt = "rag " + prompt
-        st.sidebar.text(f"forcing rag mode")
-    else:
-        st.sidebar.text(f"tool auto-selecting mode")    
         
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         message_placeholder.markdown("🤔 *Routing to the right tool...*")
 
         try:
-            payload = {"query": prompt,"thread_id": st.session_state.thread_id}
+            if enable_rag:
+                st.sidebar.text(f"forcing rag mode")
+                payload = {"query": prompt,"thread_id": st.session_state.thread_id,"tool": "rag" }
+            else:
+                st.sidebar.text(f"tool auto-selecting mode")    
+                payload = {"query": prompt,"thread_id": st.session_state.thread_id,"tool": "auto"}
             response = requests.post(f"{FASTAPI_URL}/api/v1/agent", json=payload)
 
             if response.status_code == 200:
@@ -169,14 +171,50 @@ st.divider()
 # st.header("💬 Chat Session")
 # st.caption(f"Session ID: `{st.session_state.thread_id[:8]}...`")
 
+def get_most_relevant_header(text):
+    if not text or not text.strip():
+        return ""
+
+    text = text.strip()
+
+    # 1. Try HTML
+    if re.search(r"<(?:h[1-6]|title)\b", text, re.IGNORECASE):
+        soup = BeautifulSoup(text, "html.parser")
+
+        # Prefer H1, then H2, ... H6
+        for level in range(1, 7):
+            header = soup.find(f"h{level}")
+            if header:
+                value = header.get_text(" ", strip=True)
+                if value:
+                    return value[:70]
+
+        # If there is no H1-H6, try <title>
+        if soup.title:
+            value = soup.title.get_text(" ", strip=True)
+            if value:
+                return value[:70]
+
+        # HTML but no heading
+        text = soup.get_text(" ", strip=True)
+
+    # 2. Try Markdown
+    headers = re.findall(r"^#+\s*(.+)$", text, re.MULTILINE)
+
+    if headers:
+        return headers[0].strip()[:70]
+
+    # 3. Plain text fallback
+    return text[:70].strip()
 # --- Manual Ingestion Section ---
 with st.sidebar.expander("📝 Inject Raw Text", expanded=False):
-    manual_doc_id = st.text_input("Document ID", key="manual_doc_id", value=f"manual_{uuid.uuid4().hex[:8]}")
-    manual_source = st.text_input("Source Name", key="manual_source", value="manual_injection")
-    manual_content = st.text_area("Document Content", key="manual_content", height=200, placeholder="Paste your text here...")
-    
-    if st.button("Ingest Text"):
-        if not manual_content:
+    with st.form("manual_ingest_form", clear_on_submit=True):
+        manual_doc_id = st.text_input("Document ID", value=f"manual_{uuid.uuid4().hex[:8]}")
+        manual_content = st.text_area("Document Content", height=400, placeholder="Paste your text here...")
+        manual_source = st.text_input("Source Name", value=get_most_relevant_header(manual_content))
+        submitted = st.form_submit_button("Ingest Text")
+    if submitted:
+        if not manual_content.strip():
             st.warning("Please enter content to ingest.")
         else:
             with st.spinner("Ingesting..."):
@@ -191,9 +229,6 @@ with st.sidebar.expander("📝 Inject Raw Text", expanded=False):
                     if response.status_code == 200:
                         result = response.json()
                         st.success(f"✅ Added {result['chunks_added']} chunks.")
-                        # Clear inputs
-                        st.session_state.manual_content = ""
-                        st.session_state.manual_doc_id = f"manual_{uuid.uuid4().hex[:8]}"
                     else:
                         st.error(f"❌ {response.json().get('detail', 'Error')}")
                 except Exception as e:

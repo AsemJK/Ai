@@ -13,6 +13,7 @@ class AgentState(TypedDict):
     tool_input: str  # The input to pass to the chosen tool
     tool_result: str  # The output from the tool
     final_answer: str  # The synthesized response
+    tool: str
 
 
 # 2. Router Node: The LLM decides which tool to use
@@ -56,6 +57,13 @@ JSON response:"""
     raw_response = generate_text(
         prompt=routing_prompt, max_new_tokens=4096, temperature=0.2
     )
+    # 1. If RAG is forced from UI, skip LLM routing entirely
+    if state.get("tool") == "rag":
+        return {
+            **state,
+            "tool_choice": "rag",
+            "tool_input": state["user_query"],
+        }
 
     # Parse the LLM's JSON response
     try:
@@ -70,13 +78,12 @@ JSON response:"""
     except (json.JSONDecodeError, ValueError):
         # Fallback: keyword-based routing for small models
         query_lower = state["user_query"].lower()
-    #I need to check if input start with specific set of characters to 
-    #force llm to use rag tool
-    # for example "rag "
-    
-        if query_lower.startswith("rag "):
+        #payload contains tool name: rag or auto
+        
+        tool_name = state["tool"]
+        if tool_name == "rag":
             tool_choice = "rag"
-            tool_input = state["user_query"][4:]
+            tool_input = state["user_query"]
         elif any(
             kw in query_lower
             for kw in ["server", "gpu", "rack", "temperature", "power", "node",
@@ -214,7 +221,7 @@ def build_agent():
 agent = build_agent()
 
 
-def run_agent(query: str, thread_id: str = "default_thread") -> dict:
+def run_agent(query: str, thread_id: str = "default_thread",selected_tool: str = "auto") -> dict:
     """Main entry point for the agent."""
     initial_state = {
         "user_query": query,
@@ -222,6 +229,7 @@ def run_agent(query: str, thread_id: str = "default_thread") -> dict:
         "tool_input": "",
         "tool_result": "",
         "final_answer": "",
+        "tool": selected_tool
     }
 
     # The config is where we pass the thread_id for multi-tenant isolation

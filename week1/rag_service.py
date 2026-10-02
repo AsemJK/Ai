@@ -154,7 +154,7 @@ def retrieve_context(query: str, top_k: int = 20) -> list[dict]:
         query=query_vector,
         limit=top_k,
         with_payload=True,
-        score_threshold=0.75,  # 0.x means only x*100% similarity is required to return a chunk.
+        score_threshold=0.25,  # 0.x means only x*100% similarity is required to return a chunk.
     )
 
     # 3. Format results

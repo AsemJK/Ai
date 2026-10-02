@@ -91,7 +91,6 @@ class RAGRequest(BaseModel):
     query: str
     max_new_tokens: int = 150
 
-
 @app.post("/api/v1/rag-query", response_model=GenerationResponse)
 async def rag_query_endpoint(request: RAGRequest):
     """Retrieves context and generates an answer based STRICTLY on that context."""
@@ -134,9 +133,8 @@ Answer:"""
     try:
         generated_text = await asyncio.to_thread(
             generate_text,
-            prompt=system_prompt +"\n"+ user_prompt, 
-            # 1.  system_prompt +"\n"+ user_prompt, 
-            # 2.  grounded_prompt,
+            # prompt=system_prompt +"\n"+ user_prompt, 
+            prompt=grounded_prompt, 
             max_new_tokens=request.max_new_tokens,
             temperature=0.1,  # <-- FIX: Lowered temperature for strict factual adherence
         )
@@ -151,6 +149,62 @@ Answer:"""
         tokens_generated=len(generated_text.split()),
         processing_time_ms=round(processing_time_ms, 2),
     )
+
+
+@app.post("/api/v1/rag-query-old-2", response_model=GenerationResponse)
+async def rag_query_endpoint(request: RAGRequest):
+    """Retrieves context and generates an answer based STRICTLY on that context."""
+    import time
+    import asyncio
+
+    start_time = time.time()
+
+    # 1. Retrieve relevant context
+    context_results = retrieve_context(request.query, top_k=3)
+
+    if not context_results:
+        raise HTTPException(status_code=404, detail="No relevant documents found.")
+
+    # 2. Format the context with clear source attribution
+    context_text = "\n\n".join(
+        [f"[Source: {r['source']}] {r['text']}" for r in context_results]
+    )
+
+    # 3. THE FIX: Strict Prompt with XML tags and negative constraints
+    grounded_prompt = f"""You are a strict enterprise assistant. You must answer the user's question using ONLY the information provided inside the <context> tags.
+
+CRITICAL RULES:
+1. Do NOT use your pre-trained knowledge.
+2. If the answer is not explicitly stated in the <context>, you must reply with exactly: "I do not have enough information in the provided documents to answer that."
+3. Do not make up facts.
+
+<context>
+{context_text}
+</context>
+
+Question: {request.query}
+Answer:"""
+
+    # 4. Generate response
+    try:
+        generated_text = await asyncio.to_thread(
+            generate_text,
+            prompt=grounded_prompt,
+            max_new_tokens=request.max_new_tokens,
+            temperature=0.1,  # <-- FIX: Lowered temperature for strict factual adherence
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Inference failed: {str(e)}")
+
+    processing_time_ms = (time.time() - start_time) * 1000
+
+    return GenerationResponse(
+        generated_text=generated_text,
+        model_used=MODEL_ID,
+        tokens_generated=len(generated_text.split()),
+        processing_time_ms=round(processing_time_ms, 2),
+    )
+
 
 
 @app.post("/api/v1/rag-query-old", response_model=GenerationResponse)
@@ -250,6 +304,7 @@ async def ingest_file_endpoint(
 class AgentRequest(BaseModel):
     query: str
     thread_id: str
+    tool: str
 
 
 class AgentResponse(BaseModel):
@@ -268,7 +323,7 @@ async def agent_endpoint(request: AgentRequest):
     start_time = time.time()
 
     try:
-        result = await asyncio.to_thread(run_agent, query=request.query, thread_id=request.thread_id)
+        result = await asyncio.to_thread(run_agent, query=request.query, thread_id=request.thread_id,selected_tool=request.tool)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Agent failed: {str(e)}")
 
