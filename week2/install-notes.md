@@ -16,4 +16,4 @@ docker-compose up -d
 
 http://localhost:6333/dashboard
 
-uvicorn main:app --reload --host [IP_ADDRESS] --port 8000
+uvicorn main:app --reload --host [IP_ADDRESS] --port 8070

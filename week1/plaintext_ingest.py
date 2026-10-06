@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 # Load environment variables (optional, but good practice)
 load_dotenv()
 
-FASTAPI_URL = os.getenv("FASTAPI_URL", "http://localhost:8000")
+FASTAPI_URL = os.getenv("FASTAPI_URL", "http://localhost:8070")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME", "docs_fastapi")
 # Add other env vars for your auth/keys if needed
 

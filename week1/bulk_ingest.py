@@ -3,7 +3,7 @@ import sys
 import re
 import random
 import requests
-FASTAPI_URL = "http://localhost:8000"
+FASTAPI_URL = "http://localhost:8070"
 SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".xls"}
 
 
@@ -73,7 +73,7 @@ def ingest_folder(folder_path: str):
                     errors.append((filepath, detail))
                     print(f"   ❌ Failed — {detail}\n")
             except requests.exceptions.ConnectionError:
-                print("   ❌ Cannot connect. Is FastAPI running on port 8000?\n")
+                print("   ❌ Cannot connect. Is FastAPI running on port 8070?\n")
                 sys.exit(1)
             except Exception as e:
                 errors.append((filepath, str(e)))

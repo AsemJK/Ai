@@ -4,7 +4,7 @@ from rag_service import retrieve_context  # Your Week 2 RAG function
 
 def rag_search_tool(query: str) -> str:
     """Searches the knowledge base for document-based answers."""
-    results = retrieve_context(query, top_k=3)
+    results = retrieve_context(query, top_k=5)
     if not results:
         return "No relevant documents found in the knowledge base."
 

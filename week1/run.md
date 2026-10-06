@@ -21,32 +21,37 @@ docker stop qdrant
 2- cd week1
 3- activate venv : source venv/bin/activate
 4- run backend using uvicorn:
-uvicorn main:app --reload --port 8000
+uvicorn main:app --reload --port 8070
 
 ## one command to run backend
 
 ```bash
-cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate && uvicorn main:app --reload --port 8000
+cd /mnt/c/dev/learning/ai/week1 && export HF_HUB_OFFLINE=1 && source venv/bin/activate && uvicorn main:app --reload --port 8070
 ```
 
 or without --reload flag
 
 ```bash
-cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8000
+cd /mnt/c/dev/learning/ai/week1 && export HF_HUB_OFFLINE=1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8070
+```
+
+```bash
+rsync -avP --exclude='venv' --exclude='myenv' --exclude='__pycache__' --exclude='*.pyc'  /mnt/c/Dev/Learning/ai/week1 ai/ &&
+cd ~/ai/week1 && export HF_HUB_OFFLINE=1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8070
 ```
 
 _If the address already in use error_
 **linux**
-sudo lsof -t -i tcp:8000 | xargs kill -9
+sudo lsof -t -i tcp:8070 | xargs kill -9
 **windows**
-netstat -ano | findstr :8000
+netstat -ano | findstr :8070
 taskkill /PID <PID> /F
 
-http://localhost:8000/docs
+http://localhost:8070/docs
 
 ### Streamlit Notes
 
-streamlit running on wsl in my case so I need to make sure that the port 8501 is open for the windows host machine to access it.
+streamlit running on wsl in my case so I need to make sure that the port 8505 is open for the windows host machine to access it.
 I am using tailscale on windows so:
 
 1. connectaddress=172.21.200.76 : this will make wsl machine with static ip
@@ -55,9 +60,9 @@ I am using tailscale on windows so:
 
    netsh interface portproxy add v4tov4 `    
 listenaddress=[IP_ADDRESS]`
-   listenport=8501 `    
+   listenport=8505 `    
 connectaddress=172.21.200.76`
-   connectport=8501
+   connectport=8505
 
 now I can access streamlit on [IP_ADDRESS]
 
@@ -83,7 +88,7 @@ hostname -I
 3. In Windows Host Machine PowerShell (run as Administrator):
 
 ```powershell
-netsh interface portproxy add v4tov4 listenport=8501 listenaddress=0.0.0.0 connectport=8501 connectaddress=172.21.200.76
+netsh interface portproxy add v4tov4 listenport=8505 listenaddress=0.0.0.0 connectport=8505 connectaddress=172.21.200.76
 ```
 
 run UI using streamlit:
@@ -91,14 +96,19 @@ run UI using streamlit:
 ## on command to run streamlit
 
 ```bash
-cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8505
+```
+
+```bash
+rsync -avP --exclude='venv' --exclude='myenv' --exclude='__pycache__' --exclude='*.pyc'  /mnt/c/Dev/Learning/ai/week1 ai/ &&
+cd ~/ai/week1 && export HF_HUB_OFFLINE=1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8505
 ```
 
 3. Then allow the port through Windows Firewall
 
 New-NetFirewallRule `    -DisplayName "Streamlit via Tailscale"`
 -Direction Inbound `    -Protocol TCP`
--LocalPort 8501 `
+-LocalPort 8505 `
 -Action Allow
 
 4. open http://[IP_ADDRESS] in windows browser
@@ -119,15 +129,15 @@ To make WSL2/Docker services accessible from Windows, you need to:
 2.  **Add Windows Port Proxy** (Run in PowerShell as Admin):
 
     ```powershell
-    netsh interface portproxy add v4tov4 listenaddress=[IP_ADDRESS] listenport=8000 connectaddress=[IP_ADDRESS] connectport=8000
-    netsh interface portproxy add v4tov4 listenaddress=[IP_ADDRESS] listenport=8501 listenport=8000 connectaddress=[IP_ADDRESS] connectport=8501
+    netsh interface portproxy add v4tov4 listenaddress=[IP_ADDRESS] listenport=8070 connectaddress=[IP_ADDRESS] connectport=8070
+    netsh interface portproxy add v4tov4 listenaddress=[IP_ADDRESS] listenport=8505 listenport=8070 connectaddress=[IP_ADDRESS] connectport=8505
     ```
 
 3.  **Allow Firewall** (Run in PowerShell as Admin):
 
     ```powershell
-    New-NetFirewallRule -DisplayName "WSL Port 8000" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
-    New-NetFirewallRule -DisplayName "WSL Port 8501" -Direction Inbound -Protocol TCP -LocalPort 8501 -Action Allow
+    New-NetFirewallRule -DisplayName "WSL Port 8070" -Direction Inbound -Protocol TCP -LocalPort 8070 -Action Allow
+    New-NetFirewallRule -DisplayName "WSL Port 8505" -Direction Inbound -Protocol TCP -LocalPort 8505 -Action Allow
     ```
 
 ## Agentic notes

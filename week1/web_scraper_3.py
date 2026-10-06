@@ -23,7 +23,7 @@ dotenv.load_dotenv()  # <-- Load variables from .env
 # ──────────────────────────────────────────────
 # Configuration
 # ──────────────────────────────────────────────
-FASTAPI_URL = "http://localhost:8000"
+FASTAPI_URL = "http://localhost:8070"
 REQUEST_DELAY = 1.0          # polite delay between requests (seconds)
 MIN_CONTENT_LENGTH = 200     # ignore pages with less text than this
 MAX_CRAWL_DEPTH = 2          # how deep to follow links (1 = only direct links)

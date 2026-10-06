@@ -5,7 +5,7 @@ import trafilatura
 import random
 
 # --- Configuration ---
-FASTAPI_URL = "http://localhost:8000"
+FASTAPI_URL = "http://localhost:8070"
 
 def extract_text_from_url(url: str) -> str:
     headers = {

@@ -20,7 +20,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "*"
-    ],  # allow all origins: Streamlit's default port ["http://localhost:8501", "*"]
+    ],  # allow all origins: Streamlit's default port ["http://localhost:8505", "*"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 
 # --- Configuration ---
-FASTAPI_URL = "http://localhost:8000"
+FASTAPI_URL = "http://localhost:8070"
 
 # --- Page Configuration ---
 st.set_page_config(page_title="RAG Assistant", page_icon="🧠", layout="wide")
@@ -88,7 +88,7 @@ with st.sidebar:
                         )
                 except requests.exceptions.ConnectionError:
                     st.error(
-                        "❌ Cannot connect to backend. Is FastAPI running on port 8000?"
+                        "❌ Cannot connect to backend. Is FastAPI running on port 8070?"
                     )
 # ingest bulk
 st.sidebar.divider()

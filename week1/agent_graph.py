@@ -153,22 +153,20 @@ def direct_node(state: AgentState) -> AgentState:
 
 # 4. Generator Node: Synthesize the final answer
 def generator_node(state: AgentState) -> AgentState:
-    synthesis_prompt = f"""You are a helpful enterprise assistant. Use the tool result below to answer the user's question clearly and concisely.
-
-User's original question: {state["user_query"]}
-Tool used: {state["tool_choice"]}
-Tool result:
-{state["tool_result"]}
-
-CRITICAL INSTRUCTIONS:
-1. If the user's question is in Arabic, you MUST reply entirely in fluent Arabic.
-2. If the tool result contains data, present it in a clear format.
-3. If the tool result says 'No relevant documents found', politely inform the user in their language that the information was not found.
-
-Answer:"""
+    synthesis_prompt = f"""You are a comprehensive enterprise assistant. Use the tool result below to provide a detailed, well-structured answer.
+    User's original question: {state["user_query"]}
+    Tool used: {state["tool_choice"]}
+    Tool result:
+    {state["tool_result"]}
+    CRITICAL INSTRUCTIONS:
+    1. Provide a detailed, in-depth explanation with background and nuance.
+    2. Structure your answer using markdown headings, bullet points, and citations where applicable.
+    3. If the user's question is in Arabic, reply entirely in fluent Arabic.
+    4. If the tool result says 'No relevant documents found', politely inform the user.
+    Answer:"""
 
     final_answer = generate_text(
-        prompt=synthesis_prompt, max_new_tokens=256, temperature=0.3
+        prompt=synthesis_prompt, max_new_tokens=1024, temperature=0.3
     )
 
     return {**state, "final_answer": final_answer}

@@ -13,7 +13,7 @@ from urllib.parse import urlparse, urljoin
 from typing import List, Optional, Dict
 
 # --- Configuration ---
-FASTAPI_URL = "http://localhost:8000"
+FASTAPI_URL = "http://localhost:8070"
 
 # Email Configuration (set these or use env vars)
 IMAP_SERVER = "outlook.office365.com"       # e.g., imap.gmail.com, outlook.office365.com
