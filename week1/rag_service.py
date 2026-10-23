@@ -3,6 +3,8 @@ from qdrant_client.http import models
 from sentence_transformers import SentenceTransformer
 import uuid
 import hashlib
+from dotenv import load_dotenv
+import os
 
 # 1. Initialize Embedding Model (Downloads on first run, ~130MB)
 # bge-small-en-v1.5 is optimized for retrieval tasks
@@ -18,7 +20,8 @@ EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-m3")
 
 
 # 2. Initialize Qdrant Client (Local Docker instance)
-client = QdrantClient(url="http://localhost:6333")
+load_dotenv()
+client = QdrantClient(url=os.getenv("QDRANT_URL"))
 
 COLLECTION_NAME = "asem_docs"
 VECTOR_SIZE = (

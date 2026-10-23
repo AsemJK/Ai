@@ -3,9 +3,12 @@ from bs4 import BeautifulSoup
 import io
 import trafilatura
 import random
+import os
 
 # --- Configuration ---
-FASTAPI_URL = "http://localhost:8070"
+from dotenv import load_dotenv
+load_dotenv()
+FASTAPI_URL = os.getenv("API_URL")
 
 def extract_text_from_url(url: str) -> str:
     headers = {

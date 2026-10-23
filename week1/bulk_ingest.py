@@ -3,7 +3,9 @@ import sys
 import re
 import random
 import requests
-FASTAPI_URL = "http://localhost:8070"
+from dotenv import load_dotenv
+load_dotenv()
+FASTAPI_URL = os.getenv("API_URL")
 SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".xls"}
 
 

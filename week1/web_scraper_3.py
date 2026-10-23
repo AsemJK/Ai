@@ -23,7 +23,7 @@ dotenv.load_dotenv()  # <-- Load variables from .env
 # ──────────────────────────────────────────────
 # Configuration
 # ──────────────────────────────────────────────
-FASTAPI_URL = "http://localhost:8070"
+FASTAPI_URL = os.getenv("API_URL")
 REQUEST_DELAY = 1.0          # polite delay between requests (seconds)
 MIN_CONTENT_LENGTH = 200     # ignore pages with less text than this
 MAX_CRAWL_DEPTH = 2          # how deep to follow links (1 = only direct links)
@@ -33,6 +33,7 @@ HEADERS = {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/125.0.0.0 Safari/537.36"
+        "Cookie: user_session=171L0YVfAcS4PgKCbM-h1dDOET-rp6LEBZ2vrbpAxs5JSvPE"
     )
 }
 

@@ -6,10 +6,14 @@ import bulk_ingest
 import web_scraper_3 as web_scraper
 import re
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+import os
 
+# Load environment variables from .env file
+load_dotenv()
 
 # --- Configuration ---
-FASTAPI_URL = "http://localhost:8070"
+FASTAPI_URL = os.getenv("API_URL")
 
 # --- Page Configuration ---
 st.set_page_config(page_title="RAG Assistant", page_icon="🧠", layout="wide")
@@ -136,8 +140,17 @@ if prompt := st.chat_input("Ask anything about your docs, servers, or math..."):
                 tool = result["tool_used"]
                 time_ms = result["processing_time_ms"]
 
+                #store answer in session state messages
+                # st.session_state.messages.append({"role": "assistant", "content": answer})
+
+
                 # Display answer
-                message_placeholder.markdown(answer)
+                # check if the answer already exists in session state messages
+                for msg in st.session_state.messages:
+                    if msg["content"] == answer:
+                        break
+                else:
+                    message_placeholder.markdown(answer)
 
                 # Show which tool was used (observability!)
                 tool_emoji = {

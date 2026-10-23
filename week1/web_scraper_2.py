@@ -11,9 +11,13 @@ from email.header import decode_header
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse, urljoin
 from typing import List, Optional, Dict
+from dotenv import load_dotenv
+import os
 
 # --- Configuration ---
-FASTAPI_URL = "http://localhost:8070"
+from dotenv import load_dotenv
+load_dotenv()
+FASTAPI_URL = os.getenv("API_URL")
 
 # Email Configuration (set these or use env vars)
 IMAP_SERVER = "outlook.office365.com"       # e.g., imap.gmail.com, outlook.office365.com

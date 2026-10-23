@@ -35,7 +35,14 @@ or without --reload flag
 cd /mnt/c/dev/learning/ai/week1 && export HF_HUB_OFFLINE=1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8070
 ```
 
+### Here when you will working inside wsl ubuntu
+
 ```bash
+rsync -avP --exclude='venv' --exclude='myenv' --exclude='__pycache__' --exclude='*.pyc'  /mnt/c/Dev/Learning/ai/week1 ai/ &&
+cd ~/ai/week1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8070
+```
+
+```bash HF offline
 rsync -avP --exclude='venv' --exclude='myenv' --exclude='__pycache__' --exclude='*.pyc'  /mnt/c/Dev/Learning/ai/week1 ai/ &&
 cd ~/ai/week1 && export HF_HUB_OFFLINE=1 && source venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8070
 ```
@@ -100,7 +107,12 @@ cd /mnt/c/dev/learning/ai/week1 && source venv/bin/activate && streamlit run app
 ```
 
 ```bash
-rsync -avP --exclude='venv' --exclude='myenv' --exclude='__pycache__' --exclude='*.pyc'  /mnt/c/Dev/Learning/ai/week1 ai/ &&
+# rsync -avP --exclude='venv' --exclude='myenv' --exclude='__pycache__' --exclude='*.pyc'  /mnt/c/Dev/Learning/ai/week1 ai/ &&
+cd ~/ai/week1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8505
+```
+
+```bash HF offline
+# rsync -avP --exclude='venv' --exclude='myenv' --exclude='__pycache__' --exclude='*.pyc'  /mnt/c/Dev/Learning/ai/week1 ai/ &&
 cd ~/ai/week1 && export HF_HUB_OFFLINE=1 && source venv/bin/activate && streamlit run app.py --server.address 0.0.0.0 --server.port 8505
 ```
 
